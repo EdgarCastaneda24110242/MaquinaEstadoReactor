@@ -1,0 +1,40 @@
+@startuml
+title Maquina de estados del reactor nuclear ficticio
+
+[*] --> APAGADO
+
+state APAGADO
+state INICIALIZANDO
+state OPERATIVO
+state BAJA_ENERGIA
+state EMERGENCIA
+state SCRAM
+state ENFRIAMIENTO
+state MANTENIMIENTO
+
+APAGADO --> INICIALIZANDO : encender()
+INICIALIZANDO --> OPERATIVO : autodiagnostico_ok
+INICIALIZANDO --> EMERGENCIA : falla_en_autodiagnostico
+
+OPERATIVO --> OPERATIVO : ejecutarCiclo()
+OPERATIVO --> BAJA_ENERGIA : energia < umbral
+OPERATIVO --> EMERGENCIA : temperatura alta
+OPERATIVO --> EMERGENCIA : radiacion fuera de rango
+OPERATIVO --> APAGADO : apagar()
+
+BAJA_ENERGIA --> OPERATIVO : energia_restaurada
+BAJA_ENERGIA --> MANTENIMIENTO : energia agotada
+BAJA_ENERGIA --> EMERGENCIA : temperatura sigue subiendo
+
+EMERGENCIA --> SCRAM : riesgo_critico
+EMERGENCIA --> OPERATIVO : parametros_estables
+EMERGENCIA --> MANTENIMIENTO : operador solicita revision
+
+SCRAM --> ENFRIAMIENTO : reactor detenido
+ENFRIAMIENTO --> ENFRIAMIENTO : disiparCalor()
+ENFRIAMIENTO --> MANTENIMIENTO : temperatura segura
+
+MANTENIMIENTO --> INICIALIZANDO : revision_aprobada
+MANTENIMIENTO --> APAGADO : revision pendiente
+
+@enduml

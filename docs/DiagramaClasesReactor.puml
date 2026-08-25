@@ -1,0 +1,105 @@
+@startuml
+title Diagrama de clases del reactor nuclear ficticio
+class Reactor {
+  - estadoActual : EstadoReactor
+  - energia : double
+  - temperatura : double
+  + encender() : void
+  + apagar() : void
+  + ejecutarCiclo() : void
+  + cambiarEstado(estado : EstadoReactor) : void
+  + obtenerEstado() : String
+}
+
+interface EstadoReactor {
+  + entrar(reactor : Reactor) : void
+  + ejecutar(reactor : Reactor) : void
+  + salir(reactor : Reactor) : void
+}
+
+class EstadoApagado
+class EstadoInicializando
+class EstadoOperativo
+class EstadoBajaEnergia
+class EstadoEmergencia
+class EstadoScram
+class EstadoEnfriamiento
+class EstadoMantenimiento
+
+EstadoReactor <|.. EstadoApagado
+EstadoReactor <|.. EstadoInicializando
+EstadoReactor <|.. EstadoOperativo
+EstadoReactor <|.. EstadoBajaEnergia
+EstadoReactor <|.. EstadoEmergencia
+EstadoReactor <|.. EstadoScram
+EstadoReactor <|.. EstadoEnfriamiento
+EstadoReactor <|.. EstadoMantenimiento
+Reactor o-- EstadoReactor : estado actual
+
+class ControladorReactor {
+  - reactor : Reactor
+  - monitor : MonitorSeguridad
+  + iniciarSistema() : void
+  + detenerSistema() : void
+  + procesarOrden(orden : String) : void
+}
+
+class MonitorSeguridad {
+  - limiteTemperatura : double
+  - limiteRadiacion : double
+  + evaluarSensores() : boolean
+  + activarEmergencia() : void
+}
+
+abstract class Sensor {
+  # nombre : String
+  # valor : double
+  + leer() : double
+  + estaDentroDeRango() : boolean
+}
+
+class SensorTemperatura
+class SensorRadiacion
+class SensorEnergia
+
+Sensor <|-- SensorTemperatura
+Sensor <|-- SensorRadiacion
+Sensor <|-- SensorEnergia
+MonitorSeguridad o-- Sensor : consulta
+ControladorReactor --> Reactor : controla
+ControladorReactor --> MonitorSeguridad : supervisa
+
+class SistemaEnfriamiento {
+  - activo : boolean
+  + activar() : void
+  + desactivar() : void
+  + disiparCalor() : void
+}
+
+class FuenteEnergia {
+  - nivel : double
+  - capacidad : double
+  + consumir(cantidad : double) : void
+  + recargar(cantidad : double) : void
+  + estaBaja() : boolean
+}
+
+class MemoriaEventos {
+  - eventos : List
+  + registrar(evento : String) : void
+  + consultar() : List
+}
+
+class Alarma {
+  + emitir(mensaje : String) : void
+  + silenciar() : void
+}
+
+Reactor *-- SistemaEnfriamiento
+Reactor *-- FuenteEnergia
+Reactor *-- MemoriaEventos
+MonitorSeguridad --> Alarma : activa
+Reactor --> SensorTemperatura : recibe lectura
+Reactor --> SensorRadiacion : recibe lectura
+Reactor --> SensorEnergia : recibe lectura
+@enduml
