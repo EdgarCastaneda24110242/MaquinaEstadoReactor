@@ -1,27 +1,21 @@
-CXX ?= g++
-CXXFLAGS ?= -std=c++17 -Wall -Wextra -pedantic -Iinclude
-TARGET := reactor
-BUILD_DIR := build
+CXX := g++
+CXXFLAGS := -std=c++20 -Wall -Wextra -pedantic -Iinclude
+LDFLAGS := -lsfml-graphics -lsfml-window -lsfml-system
+TARGET := bin/ZombieAStar.exe
 SOURCES := $(wildcard src/*.cpp)
-OBJECTS := $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
 
-MKDIR_BUILD = if not exist "$(BUILD_DIR)" mkdir "$(BUILD_DIR)"
+all: zombie
 
-.PHONY: all clean run
-
-all: $(TARGET)
-
-$(TARGET): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
-
-$(BUILD_DIR)/%.o: src/%.cpp
-	@$(MKDIR_BUILD)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET): $(SOURCES)
+	@if not exist bin mkdir bin
+	$(CXX) $(CXXFLAGS) $(SOURCES) -o $@ $(LDFLAGS)
 
 run: $(TARGET)
-	./$(TARGET)
+	$(TARGET)
+
+zombie: run
 
 clean:
-	@if exist "$(BUILD_DIR)" rmdir /s /q "$(BUILD_DIR)"
-	@if exist "$(TARGET).exe" del /q "$(TARGET).exe"
-	@if exist "$(TARGET)" del /q "$(TARGET)"
+	@if exist bin\ZombieAStar.exe del /Q bin\ZombieAStar.exe
+
+.PHONY: all run zombie clean
